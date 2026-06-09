@@ -1,0 +1,4 @@
+# Prevent direct web access to model files and JSON sidecars for security
+<FilesMatch "\.(phpml|json|csv|txt|log)$">
+    Require all denied
+</FilesMatch>

@@ -1,0 +1,495 @@
+{
+    "trained_at": "2026-06-08 22:11:41",
+    "dataset_size": 150,
+    "accuracy": 0.8387,
+    "algorithm": "NaiveBayes_Pipeline",
+    "version": "20260608_221141",
+    "indicators": {
+        "technical": [
+            {
+                "word": "system",
+                "weight": 2.6391
+            },
+            {
+                "word": "using",
+                "weight": 2.1799
+            },
+            {
+                "word": "for",
+                "weight": 2.1063
+            },
+            {
+                "word": "based",
+                "weight": 2.1026
+            },
+            {
+                "word": "design",
+                "weight": 1.6679
+            },
+            {
+                "word": "development",
+                "weight": 1.598
+            },
+            {
+                "word": "web",
+                "weight": 1.4931
+            },
+            {
+                "word": "with",
+                "weight": 1.4931
+            },
+            {
+                "word": "efficacy",
+                "weight": 1.3863
+            },
+            {
+                "word": "mapping",
+                "weight": 1.0986
+            },
+            {
+                "word": "real",
+                "weight": 1.0986
+            },
+            {
+                "word": "time",
+                "weight": 1.0986
+            },
+            {
+                "word": "data",
+                "weight": 1.0986
+            },
+            {
+                "word": "gps",
+                "weight": 1.0986
+            },
+            {
+                "word": "grading",
+                "weight": 1.0986
+            },
+            {
+                "word": "isolation",
+                "weight": 1.0986
+            },
+            {
+                "word": "characterization",
+                "weight": 1.0986
+            },
+            {
+                "word": "against",
+                "weight": 1.0986
+            },
+            {
+                "word": "plastic",
+                "weight": 1.0986
+            },
+            {
+                "word": "from",
+                "weight": 1.0986
+            },
+            {
+                "word": "cassava",
+                "weight": 1.0986
+            },
+            {
+                "word": "gis",
+                "weight": 1.0986
+            },
+            {
+                "word": "cost",
+                "weight": 1.0986
+            },
+            {
+                "word": "monitoring",
+                "weight": 1.0986
+            },
+            {
+                "word": "construction",
+                "weight": 1.0986
+            },
+            {
+                "word": "forest",
+                "weight": 1.0986
+            },
+            {
+                "word": "thermal",
+                "weight": 1.0986
+            },
+            {
+                "word": "automated",
+                "weight": 1.073
+            },
+            {
+                "word": "local",
+                "weight": 0.9704
+            },
+            {
+                "word": "rice",
+                "weight": 0.8318
+            },
+            {
+                "word": "and",
+                "weight": 0.7678
+            },
+            {
+                "word": "crop",
+                "weight": 0.7324
+            },
+            {
+                "word": "disease",
+                "weight": 0.7324
+            },
+            {
+                "word": "higher",
+                "weight": 0.7324
+            },
+            {
+                "word": "poultry",
+                "weight": 0.7324
+            },
+            {
+                "word": "low",
+                "weight": 0.7324
+            },
+            {
+                "word": "water",
+                "weight": 0.7324
+            },
+            {
+                "word": "iot",
+                "weight": 0.6931
+            },
+            {
+                "word": "application",
+                "weight": 0.6931
+            },
+            {
+                "word": "pest",
+                "weight": 0.6931
+            }
+        ],
+        "social": [
+            {
+                "word": "school",
+                "weight": 1.6094
+            },
+            {
+                "word": "schools",
+                "weight": 1.6094
+            },
+            {
+                "word": "impact",
+                "weight": 1.4648
+            },
+            {
+                "word": "the",
+                "weight": 1.4166
+            },
+            {
+                "word": "behavior",
+                "weight": 1.3863
+            },
+            {
+                "word": "assessing",
+                "weight": 1.3863
+            },
+            {
+                "word": "camiling",
+                "weight": 1.1198
+            },
+            {
+                "word": "psychological",
+                "weight": 1.0986
+            },
+            {
+                "word": "organic",
+                "weight": 1.0986
+            },
+            {
+                "word": "consumer",
+                "weight": 1.0986
+            },
+            {
+                "word": "lived",
+                "weight": 1.0986
+            },
+            {
+                "word": "experiences",
+                "weight": 1.0986
+            },
+            {
+                "word": "affecting",
+                "weight": 1.0986
+            },
+            {
+                "word": "barangay",
+                "weight": 1.0986
+            },
+            {
+                "word": "workers",
+                "weight": 1.0986
+            },
+            {
+                "word": "agrarian",
+                "weight": 1.0986
+            },
+            {
+                "word": "reform",
+                "weight": 1.0986
+            },
+            {
+                "word": "programs",
+                "weight": 1.0986
+            },
+            {
+                "word": "pupils",
+                "weight": 1.0986
+            },
+            {
+                "word": "determinants",
+                "weight": 1.0986
+            },
+            {
+                "word": "job",
+                "weight": 1.0986
+            },
+            {
+                "word": "classroom",
+                "weight": 1.0986
+            },
+            {
+                "word": "styles",
+                "weight": 1.0986
+            },
+            {
+                "word": "between",
+                "weight": 1.0986
+            },
+            {
+                "word": "academic",
+                "weight": 1.073
+            },
+            {
+                "word": "performance",
+                "weight": 1.073
+            },
+            {
+                "word": "effectiveness",
+                "weight": 1.0397
+            },
+            {
+                "word": "teachers",
+                "weight": 1.0397
+            },
+            {
+                "word": "high",
+                "weight": 1.0397
+            },
+            {
+                "word": "tarlac",
+                "weight": 0.973
+            },
+            {
+                "word": "students",
+                "weight": 0.9197
+            },
+            {
+                "word": "economic",
+                "weight": 0.8981
+            },
+            {
+                "word": "among",
+                "weight": 0.8959
+            },
+            {
+                "word": "health",
+                "weight": 0.8318
+            },
+            {
+                "word": "satisfaction",
+                "weight": 0.8318
+            },
+            {
+                "word": "systems",
+                "weight": 0.8047
+            },
+            {
+                "word": "student",
+                "weight": 0.8047
+            },
+            {
+                "word": "perceived",
+                "weight": 0.7324
+            },
+            {
+                "word": "community",
+                "weight": 0.7324
+            },
+            {
+                "word": "scale",
+                "weight": 0.7324
+            }
+        ],
+        "social_technical": [
+            {
+                "word": "technical",
+                "weight": 2.7081
+            },
+            {
+                "word": "adoption",
+                "weight": 2.4849
+            },
+            {
+                "word": "user",
+                "weight": 2.1972
+            },
+            {
+                "word": "digital",
+                "weight": 2.1972
+            },
+            {
+                "word": "socio",
+                "weight": 2.1586
+            },
+            {
+                "word": "usability",
+                "weight": 1.9459
+            },
+            {
+                "word": "technology",
+                "weight": 1.9459
+            },
+            {
+                "word": "and",
+                "weight": 1.8888
+            },
+            {
+                "word": "acceptance",
+                "weight": 1.7918
+            },
+            {
+                "word": "social",
+                "weight": 1.6173
+            },
+            {
+                "word": "readiness",
+                "weight": 1.6094
+            },
+            {
+                "word": "assessment",
+                "weight": 1.4556
+            },
+            {
+                "word": "apps",
+                "weight": 1.3863
+            },
+            {
+                "word": "technologies",
+                "weight": 1.3863
+            },
+            {
+                "word": "integration",
+                "weight": 1.3863
+            },
+            {
+                "word": "tools",
+                "weight": 1.3863
+            },
+            {
+                "word": "barriers",
+                "weight": 1.3863
+            },
+            {
+                "word": "the",
+                "weight": 1.1848
+            },
+            {
+                "word": "services",
+                "weight": 1.1198
+            },
+            {
+                "word": "economic",
+                "weight": 1.1197
+            },
+            {
+                "word": "energy",
+                "weight": 1.0986
+            },
+            {
+                "word": "perception",
+                "weight": 1.0986
+            },
+            {
+                "word": "experience",
+                "weight": 1.0986
+            },
+            {
+                "word": "adaptability",
+                "weight": 1.0986
+            },
+            {
+                "word": "cyber",
+                "weight": 1.0986
+            },
+            {
+                "word": "ict",
+                "weight": 1.0986
+            },
+            {
+                "word": "environmental",
+                "weight": 1.0986
+            },
+            {
+                "word": "modern",
+                "weight": 1.0986
+            },
+            {
+                "word": "farms",
+                "weight": 1.0397
+            },
+            {
+                "word": "rural",
+                "weight": 0.9197
+            },
+            {
+                "word": "among",
+                "weight": 0.8959
+            },
+            {
+                "word": "evaluating",
+                "weight": 0.8318
+            },
+            {
+                "word": "systems",
+                "weight": 0.8047
+            },
+            {
+                "word": "literacy",
+                "weight": 0.7324
+            },
+            {
+                "word": "engagement",
+                "weight": 0.7324
+            },
+            {
+                "word": "government",
+                "weight": 0.7324
+            },
+            {
+                "word": "challenges",
+                "weight": 0.7324
+            },
+            {
+                "word": "financial",
+                "weight": 0.7324
+            },
+            {
+                "word": "role",
+                "weight": 0.7324
+            },
+            {
+                "word": "awareness",
+                "weight": 0.7324
+            }
+        ]
+    }
+}

@@ -8,7 +8,7 @@ require_once '../config/config.php';
 require_once '../includes/functions.php';
 
 // Require staff login
-requireStaffLogin();
+requireLogin();
 
 $base_path = __DIR__ . '/../uploads/';
 $current_year = date('Y');
@@ -124,145 +124,334 @@ function getStatistics($structure) {
 $statistics = getStatistics($folder_structure);
 
 $page_title = 'Folder Explorer';
-$active_page = 'explorer';
-include 'auth_header.php';
+$base_url = '../';
+$active_menu = 'explorer';
+include '../includes/auth_header.php';
 ?>
 
 <style>
+:root {
+    --tau-green: #006400;
+    --tau-green-light: #228B22;
+    --tau-green-pale: #e8f5e9;
+    --primary-gradient: linear-gradient(135deg, #006400 0%, #228B22 100%);
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
 .explorer-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--primary-gradient);
     color: white;
-    padding: 2rem 0;
-    margin-bottom: 2rem;
+    padding: 2rem 2rem;
+    margin-bottom: 1.5rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 20px rgba(0, 100, 0, 0.1);
+    position: relative;
+}
+
+.explorer-header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.explorer-header p {
+    margin: 0.5rem 0 0 0;
+    opacity: 0.9;
+    font-size: 0.95rem;
+}
+
+.reload-indicator {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.reload-indicator.show {
+    opacity: 1;
+}
+
+.reload-indicator i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .stats-card {
     background: white;
-    border-radius: 10px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: var(--shadow-sm);
     margin-bottom: 1rem;
-    transition: transform 0.2s;
+    border: 1px solid #f1f3f5;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .stats-card:hover {
     transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 .stats-number {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #667eea;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--tau-green);
+    line-height: 1.2;
+}
+
+.stats-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.filter-section {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid #e9ecef;
+}
+
+.filter-section .form-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
 }
 
 .folder-card {
     background: white;
-    border-radius: 10px;
+    border-radius: 12px;
     padding: 1.5rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid #e9ecef;
 }
 
 .folder-header {
     display: flex;
     align-items: center;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid #f0f0f0;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--tau-green-pale);
 }
 
 .folder-icon {
     font-size: 1.5rem;
-    margin-right: 0.5rem;
+    margin-right: 0.75rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: var(--tau-green-pale);
+}
+
+.folder-header h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #212529;
+}
+
+.folder-header small {
+    color: #6c757d;
+    font-size: 0.85rem;
 }
 
 .queue-item {
-    background: #f8f9fa;
-    border-radius: 8px;
+    background: #fcfdfe;
+    border-radius: 10px;
     padding: 1rem;
-    margin-bottom: 0.5rem;
-    border-left: 4px solid #667eea;
-    transition: all 0.2s;
+    margin-bottom: 0.75rem;
+    border: 1px solid #f1f3f5;
+    border-left: 4px solid var(--tau-green-light);
+    transition: all 0.2s ease-in-out;
 }
 
 .queue-item:hover {
-    background: #e9ecef;
-    transform: translateX(5px);
+    background: #f8faf8;
+    transform: translateX(3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.queue-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.queue-header h5 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #212529;
+}
+
+.queue-header small {
+    color: #6c757d;
+    font-size: 0.8rem;
 }
 
 .file-list {
-    margin-top: 0.5rem;
+    margin-top: 0.75rem;
 }
 
 .file-item {
     display: flex;
-    justify-content: between;
+    justify-content: space-between;
     align-items: center;
-    padding: 0.5rem;
+    padding: 0.6rem 0.85rem;
     background: white;
-    border-radius: 5px;
-    margin-bottom: 0.25rem;
-    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    margin-bottom: 0.4rem;
+    border: 1px solid #e9ecef;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.file-item:hover {
+    border-color: var(--tau-green-light);
+    background-color: #fafdfa;
 }
 
 .file-name {
     flex: 1;
     font-weight: 500;
+    color: #495057;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.file-name i {
+    font-size: 1.1rem;
 }
 
 .file-info {
-    font-size: 0.875rem;
-    color: #6c757d;
+    font-size: 0.8rem;
+    color: #868e96;
+    margin-right: 1rem;
 }
 
 .btn-download {
-    background: #28a745;
+    background: var(--tau-green-light);
     color: white;
     border: none;
-    padding: 0.25rem 0.75rem;
-    border-radius: 5px;
-    font-size: 0.875rem;
+    padding: 0.35rem 1rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background-color 0.2s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
 }
 
 .btn-download:hover {
-    background: #218838;
+    background: var(--tau-green);
+    transform: translateY(-1px);
 }
 
-.filter-section {
-    background: white;
-    border-radius: 10px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+.btn-download i {
+    font-size: 0.85rem;
 }
 
 .year-badge {
-    background: #667eea;
+    background: var(--tau-green);
     color: white;
-    padding: 0.25rem 0.75rem;
+    padding: 0.3rem 0.85rem;
     border-radius: 20px;
-    font-size: 0.875rem;
+    font-size: 0.8rem;
+    font-weight: 600;
 }
 
 .empty-state {
     text-align: center;
-    padding: 3rem;
-    color: #6c757d;
+    padding: 4rem 2rem;
+    color: #868e96;
 }
 
 .empty-state i {
     font-size: 4rem;
     margin-bottom: 1rem;
-    opacity: 0.5;
+    color: var(--tau-green-pale);
+}
+
+.empty-state h4 {
+    color: #495057;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .explorer-header {
+        padding: 1.5rem 1rem;
+    }
+    
+    .explorer-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .stats-card {
+        padding: 1rem;
+    }
+    
+    .stats-number {
+        font-size: 1.5rem;
+    }
+    
+    .filter-section {
+        padding: 1rem;
+    }
+    
+    .folder-card {
+        padding: 1rem;
+    }
+    
+    .file-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .file-info {
+        margin-right: 0;
+        margin-bottom: 0.25rem;
+    }
+    
+    .btn-download {
+        width: 100%;
+        justify-content: center;
+    }
 }
 </style>
 
 <div class="explorer-header">
     <div class="container">
-        <h1><i class="bi bi-folder2-open me-3"></i>Folder Explorer</h1>
+        <h1 style="color: white;"><i class="bi bi-folder2-open me-3" style="color: white;"></i>Folder Explorer</h1>
         <p class="mb-0">Browse and manage QF-39 and QF-40 documents organized by year and queue number</p>
+        <div class="reload-indicator" id="reloadIndicator">
+            <i class="bi bi-arrow-clockwise"></i>
+            <span>Checking for updates...</span>
+        </div>
     </div>
 </div>
 
@@ -272,25 +461,25 @@ include 'auth_header.php';
         <div class="col-md-3">
             <div class="stats-card text-center">
                 <div class="stats-number"><?php echo $statistics['total_queues']; ?></div>
-                <div class="text-muted">Total Queues</div>
+                <div class="stats-label">Total Queues</div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="stats-card text-center">
                 <div class="stats-number"><?php echo $statistics['total_files']; ?></div>
-                <div class="text-muted">Total Files</div>
+                <div class="stats-label">Total Files</div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="stats-card text-center">
                 <div class="stats-number"><?php echo number_format($statistics['total_size'] / 1024 / 1024, 2); ?> MB</div>
-                <div class="text-muted">Total Size</div>
+                <div class="stats-label">Total Size</div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="stats-card text-center">
                 <div class="stats-number"><?php echo $statistics['qf39_files'] + $statistics['qf40_files']; ?></div>
-                <div class="text-muted">Documents</div>
+                <div class="stats-label">Documents</div>
             </div>
         </div>
     </div>
@@ -358,12 +547,12 @@ include 'auth_header.php';
                 
                 <?php foreach ($queues as $queue_number => $files): ?>
                     <div class="queue-item">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h5 class="mb-0">
+                        <div class="queue-header">
+                            <h5>
                                 <i class="bi bi-folder-fill me-2"></i>
                                 <?php echo htmlspecialchars($queue_number); ?>
                             </h5>
-                            <small class="text-muted"><?php echo count($files); ?> files</small>
+                            <small><?php echo count($files); ?> files</small>
                         </div>
                         
                         <div class="file-list">
@@ -375,10 +564,10 @@ include 'auth_header.php';
                                         if ($file['type'] === 'pdf') $icon = 'bi-file-earmark-pdf';
                                         elseif ($file['type'] === 'docx') $icon = 'bi-file-earmark-word';
                                         ?>
-                                        <i class="bi <?php echo $icon; ?> me-2"></i>
+                                        <i class="bi <?php echo $icon; ?>"></i>
                                         <?php echo htmlspecialchars($file['name']); ?>
                                     </div>
-                                    <div class="file-info me-3">
+                                    <div class="file-info">
                                         <?php echo number_format($file['size'] / 1024, 2); ?> KB | 
                                         <?php echo date('M d, Y H:i', $file['modified']); ?>
                                     </div>
@@ -410,12 +599,49 @@ function downloadFile(folderType, queueNumber, fileName) {
     document.body.removeChild(link);
 }
 
-// Auto-refresh every 30 seconds to show new files
-setInterval(() => {
-    if (confirm('New files may have been added. Refresh the page?')) {
-        location.reload();
+// Silent reload using fingerprint-based polling
+let currentFingerprint = null;
+const POLL_INTERVAL = 15000; // Check every 15 seconds
+
+async function checkForUpdates() {
+    try {
+        const response = await fetch('../api/poll-updates.php?type=explorer');
+        if (!response.ok) return;
+        
+        const data = await response.json();
+        
+        if (currentFingerprint === null) {
+            // Initial load - store fingerprint
+            currentFingerprint = data.fingerprint;
+        } else if (data.fingerprint !== currentFingerprint) {
+            // Fingerprint changed - silent reload
+            showReloadIndicator();
+            currentFingerprint = data.fingerprint;
+            
+            // Wait a moment for visual feedback, then reload
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        }
+    } catch (error) {
+        console.error('Poll error:', error);
     }
-}, 30000);
+}
+
+function showReloadIndicator() {
+    const indicator = document.getElementById('reloadIndicator');
+    if (indicator) {
+        indicator.classList.add('show');
+        setTimeout(() => {
+            indicator.classList.remove('show');
+        }, 2000);
+    }
+}
+
+// Start polling
+setInterval(checkForUpdates, POLL_INTERVAL);
+// Initial check after page load
+setTimeout(checkForUpdates, 2000);
 </script>
 
-<?php include 'auth_footer.php'; ?>
+<?php include '../includes/auth_footer.php'; ?>

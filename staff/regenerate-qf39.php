@@ -68,6 +68,7 @@ try {
         'FILLED' => date('F d, Y'),
         'STAFF' => '________________________',
         'SIGNED' => '________________________',
+        'APP_NUMBER' => $queue_number, // Application Number = Queue Number
     ]);
 
     // Check for signature file

@@ -369,6 +369,37 @@ include '../includes/auth_header.php';
         font-size: 1rem !important;
     }
 }
+
+.reload-indicator {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: rgba(0, 100, 0, 0.9);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.reload-indicator.show {
+    opacity: 1;
+}
+
+.reload-indicator i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
 </style>
 
 <div class="container-fluid py-4">
@@ -388,6 +419,10 @@ include '../includes/auth_header.php';
         <?php
 endif; ?>
     </h2>
+    <div class="reload-indicator" id="reloadIndicator">
+        <i class="bi bi-arrow-clockwise"></i>
+        <span>Checking for updates...</span>
+    </div>
 
     <!-- Filter Bar -->
     <div class="card border-0 shadow-sm mb-4 filter-card">
@@ -1228,6 +1263,50 @@ function setLayout(layout) {
     // Save preference
     localStorage.setItem('applications_layout', layout);
 }
+
+// Silent reload using fingerprint-based polling
+let currentFingerprint = null;
+const POLL_INTERVAL = 15000; // Check every 15 seconds
+
+async function checkForUpdates() {
+    try {
+        const response = await fetch('../api/poll-updates.php?type=applications');
+        if (!response.ok) return;
+
+        const data = await response.json();
+
+        if (currentFingerprint === null) {
+            // Initial load - store fingerprint
+            currentFingerprint = data.fingerprint;
+        } else if (data.fingerprint !== currentFingerprint) {
+            // Fingerprint changed - silent reload
+            showReloadIndicator();
+            currentFingerprint = data.fingerprint;
+
+            // Wait a moment for visual feedback, then reload
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        }
+    } catch (error) {
+        console.error('Poll error:', error);
+    }
+}
+
+function showReloadIndicator() {
+    const indicator = document.getElementById('reloadIndicator');
+    if (indicator) {
+        indicator.classList.add('show');
+        setTimeout(() => {
+            indicator.classList.remove('show');
+        }, 2000);
+    }
+}
+
+// Start polling
+setInterval(checkForUpdates, POLL_INTERVAL);
+// Initial check after page load
+setTimeout(checkForUpdates, 2000);
 </script>
 
 <?php include '../includes/auth_footer.php'; ?>

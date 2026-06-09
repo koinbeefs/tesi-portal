@@ -8,7 +8,7 @@ require_once '../config/config.php';
 require_once '../includes/functions.php';
 
 // Require staff login
-requireStaffLogin();
+requireLogin();
 
 $folder_type = $_GET['folder'] ?? '';
 $queue_number = $_GET['queue'] ?? '';

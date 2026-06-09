@@ -77,6 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'FILLED' => date('F d, Y'),
             'STAFF' => '________________________', // filled by DRD staff
             'SIGNED' => '________________________', // filled by DRD staff
+            'APP_NUMBER' => $queue_number, // Application Number = Queue Number
         ]);
 
         // Add signature image if uploaded and is an image format (not PDF)

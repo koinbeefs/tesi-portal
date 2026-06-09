@@ -494,6 +494,25 @@ include 'includes/header.php';
                     <div class="col-md-12" id="other_type_div" style="display:none;">
                         <input type="text" name="other_type" id="field_other_type" class="form-control" placeholder="Specify other type">
                     </div>
+
+                    <!-- AI Advisor Card Container -->
+                    <div class="col-md-12" id="ai_advisor_container" style="display:none; margin-top: 10px;">
+                        <div class="card border-0 shadow-sm" style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border-radius: 12px; border-left: 5px solid var(--tau-green-light) !important;">
+                            <div class="card-body p-3">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="spinner-grow spinner-grow-sm text-success" id="ai_spinner" role="status" style="display:none;"></div>
+                                        <i class="bi bi-cpu text-success fs-5" id="ai_icon"></i>
+                                        <span class="fw-bold text-success" style="font-size: 14px;">TeSI AI Advisor</span>
+                                    </div>
+                                    <small class="text-muted" id="ai_accuracy_badge" style="font-size: 11px;"></small>
+                                </div>
+                                <div id="ai_suggestion_content">
+                                    <!-- Suggestion message will be inserted dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Fee Information Section -->
@@ -718,6 +737,31 @@ include 'includes/header.php';
             });
             form.addEventListener('change', function() {
                 saveFormData();
+            });
+        }
+
+        // Real-time AI Advisor integration
+        const titleInput = document.getElementById('field_research_title');
+        const typeSelect = document.getElementById('field_research_type');
+        
+        if (titleInput) {
+            let aiTimeout = null;
+            titleInput.addEventListener('input', function() {
+                clearTimeout(aiTimeout);
+                aiTimeout = setTimeout(checkTitleAI, 800);
+            });
+            
+            // Trigger check on load if title is already populated
+            if (titleInput.value.trim().length >= 5) {
+                checkTitleAI();
+            }
+        }
+        
+        if (typeSelect) {
+            typeSelect.addEventListener('change', function() {
+                if (lastAIPrediction) {
+                    updateAISuggestionUI(lastAIPrediction, lastAIIndicators, lastAIAccuracy);
+                }
             });
         }
     });
@@ -1149,6 +1193,162 @@ include 'includes/header.php';
             statusDiv.innerHTML = '';
         }
     });
+
+    // --- TeSI AI Advisor Functions ---
+    let lastAIPrediction = null;
+    let lastAIIndicators = [];
+    let lastAIAccuracy = 0;
+
+    function checkTitleAI() {
+        const titleInput = document.getElementById('field_research_title');
+        if (!titleInput) return;
+        
+        const title = titleInput.value.trim();
+        const advisorContainer = document.getElementById('ai_advisor_container');
+        const spinner = document.getElementById('ai_spinner');
+        const icon = document.getElementById('ai_icon');
+        const suggestionContent = document.getElementById('ai_suggestion_content');
+        const accuracyBadge = document.getElementById('ai_accuracy_badge');
+
+        if (title.length < 5) {
+            if (advisorContainer) advisorContainer.style.display = 'none';
+            lastAIPrediction = null;
+            return;
+        }
+
+        if (advisorContainer) advisorContainer.style.display = 'block';
+        if (spinner) spinner.style.display = 'inline-block';
+        if (icon) icon.style.display = 'none';
+        if (suggestionContent) {
+            suggestionContent.innerHTML = '<p class="text-muted mb-0 small"><span class="spinner-border spinner-border-sm me-2" role="status"></span>Analyzing title structure and key indicators...</p>';
+        }
+        if (accuracyBadge) accuracyBadge.innerText = '';
+
+        fetch('api/predict-research-type.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'title=' + encodeURIComponent(title)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (spinner) spinner.style.display = 'none';
+            if (icon) icon.style.display = 'inline-block';
+            
+            if (data.status === 'success') {
+                lastAIPrediction = data.prediction;
+                lastAIIndicators = data.indicators || [];
+                lastAIAccuracy = data.model_accuracy;
+                
+                updateAISuggestionUI(lastAIPrediction, lastAIIndicators, lastAIAccuracy);
+            } else {
+                if (advisorContainer) advisorContainer.style.display = 'none';
+            }
+        })
+        .catch(error => {
+            if (spinner) spinner.style.display = 'none';
+            if (icon) icon.style.display = 'inline-block';
+            if (advisorContainer) advisorContainer.style.display = 'none';
+            console.error('AI Predictor Error:', error);
+        });
+    }
+
+    function updateAISuggestionUI(prediction, indicators, accuracy) {
+        const typeSelect = document.getElementById('field_research_type');
+        if (!typeSelect) return;
+        
+        const currentSelection = typeSelect.value;
+        const suggestionContent = document.getElementById('ai_suggestion_content');
+        const accuracyBadge = document.getElementById('ai_accuracy_badge');
+        if (!suggestionContent) return;
+        
+        if (accuracyBadge) {
+            accuracyBadge.innerText = `Accuracy: ${(accuracy * 100).toFixed(1)}%`;
+        }
+        
+        // Format matched keywords
+        let keywordHtml = '';
+        if (indicators && indicators.length > 0) {
+            const topWords = indicators.slice(0, 4).map(ind => `<strong class="text-dark">${escapeHtml(ind.word)}</strong>`);
+            keywordHtml = `<span class="text-muted ms-1" style="font-size: 12px;">(based on terms: ${topWords.join(', ')})</span>`;
+        }
+        
+        const displayNames = {
+            'technical': 'Technical',
+            'social': 'Social',
+            'social_technical': 'Social/Technical'
+        };
+        
+        const predictedDisplayName = displayNames[prediction] || prediction;
+        
+        if (currentSelection === '') {
+            // No selection yet
+            suggestionContent.innerHTML = `
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <p class="mb-0 small text-secondary">
+                        💡 AI suggests this is likely a <strong>${predictedDisplayName}</strong> paper. ${keywordHtml}
+                    </p>
+                    <button type="button" class="btn btn-sm btn-success text-white py-1 px-3" onclick="applyAISuggestion('${prediction}')">
+                        Apply Suggestion
+                    </button>
+                </div>
+            `;
+        } else if (currentSelection === prediction) {
+            // Selection matches AI prediction
+            suggestionContent.innerHTML = `
+                <p class="mb-0 small text-success">
+                    <i class="bi bi-check-circle-fill me-1"></i> AI agrees with your selection: <strong>${predictedDisplayName}</strong>. ${keywordHtml}
+                </p>
+            `;
+        } else {
+            // Selection does NOT match AI prediction
+            const currentDisplayName = displayNames[currentSelection] || currentSelection;
+            suggestionContent.innerHTML = `
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <p class="mb-0 small text-warning">
+                        ⚠️ AI suggests <strong>${predictedDisplayName}</strong> instead of your selected <strong>${currentDisplayName}</strong>. ${keywordHtml}
+                    </p>
+                    <button type="button" class="btn btn-sm btn-warning text-dark py-1 px-3 fw-bold" onclick="applyAISuggestion('${prediction}')">
+                        Correct Type
+                    </button>
+                </div>
+            `;
+        }
+    }
+
+    function applyAISuggestion(prediction) {
+        const typeSelect = document.getElementById('field_research_type');
+        if (!typeSelect) return;
+        
+        typeSelect.value = prediction;
+        
+        // Trigger change event to trigger other UI updates
+        typeSelect.dispatchEvent(new Event('change'));
+        
+        // Update the UI card
+        if (lastAIPrediction) {
+            updateAISuggestionUI(lastAIPrediction, lastAIIndicators, lastAIAccuracy);
+        }
+        
+        // Add a quick flash animation to the select input to show it updated
+        typeSelect.style.transition = 'all 0.3s';
+        typeSelect.style.borderColor = 'var(--tau-green-light)';
+        typeSelect.style.boxShadow = '0 0 10px rgba(34, 139, 34, 0.5)';
+        setTimeout(() => {
+            typeSelect.style.borderColor = '';
+            typeSelect.style.boxShadow = '';
+        }, 1000);
+    }
+
+    function escapeHtml(unsafe) {
+        return unsafe
+             .replace(/&/g, "&amp;")
+             .replace(/</g, "&lt;")
+             .replace(/>/g, "&gt;")
+             .replace(/"/g, "&quot;")
+             .replace(/'/g, "&#039;");
+    }
 </script>
 
 <?php include 'includes/footer.php'; ?>
